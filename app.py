@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import os
-
+from aws_cdk import App
+from dev_setup_stacks import NetworkingStack, DevStack
 import aws_cdk as cdk
 
-from python.python_stack import PythonStack
 
-
-app = cdk.App()
-PythonStack(app, "PythonStack",
+app = App()
+#DevStack(app, "DevStack",
+#         env=cdk.Environment(region="us-east-1")
+NetworkStack = NetworkingStack(app, "NetworkingStack", env=cdk.Environment(region="us-east-1"))
+DevStack = DevStack(app, "DevStack", env=cdk.Environment(region="us-east-1"), vpc=NetworkStack.vpc)
+DevStack.add_dependency(NetworkStack)
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
@@ -23,6 +26,6 @@ PythonStack(app, "PythonStack",
     #env=cdk.Environment(account='123456789012', region='us-east-1'),
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+
 
 app.synth()
