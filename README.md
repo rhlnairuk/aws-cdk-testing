@@ -12,6 +12,13 @@ directory.  To create the virtualenv it assumes that there is a `python3`
 package. If for any reason the automatic creation of the virtualenv fails,
 you can create the virtualenv manually.
 
+Install cdk
+
+```
+npm install -g aws-cdk  
+```
+
+
 To manually create a virtualenv on MacOS and Linux:
 
 ```
