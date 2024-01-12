@@ -4,28 +4,29 @@ from aws_cdk import App
 from dev_setup_stacks import NetworkingStack, DevStack
 import aws_cdk as cdk
 
-
+aws_account = os.environ['CDK_DEPLOY_ACCOUNT']
 app = App()
-#DevStack(app, "DevStack",
+env_default = cdk.Environment(region="us-east-1", account=aws_account)
+# DevStack(app, "DevStack",
 #         env=cdk.Environment(region="us-east-1")
-NetworkStack = NetworkingStack(app, "NetworkingStack", env=cdk.Environment(region="us-east-1"))
-DevStack = DevStack(app, "DevStack", env=cdk.Environment(region="us-east-1"), vpc=NetworkStack.vpc)
+NetworkStack = NetworkingStack(app, "NetworkingStack", env=env_default)
+DevStack = DevStack(app, "DevStack", env=env_default, vpc=NetworkStack.vpc)
 DevStack.add_dependency(NetworkStack)
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
+# If you don't specify 'env', this stack will be environment-agnostic.
+# Account/Region-dependent features and context lookups will not work,
+# but a single synthesized template can be deployed anywhere.
 
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
+# Uncomment the next line to specialize this stack for the AWS Account
+# and Region that are implied by the current CLI configuration.
 
-    #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
+# env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
 
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
+# Uncomment the next line if you know exactly what Account and Region you
+# want to deploy the stack to. */
 
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
+# env=cdk.Environment(account='123456789012', region='us-east-1'),
 
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
+# For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
 
 
 app.synth()

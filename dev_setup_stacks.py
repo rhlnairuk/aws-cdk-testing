@@ -17,13 +17,14 @@ app_server_user_data.add_commands(
     "# Add application server specific setup commands here",
 )
 
+
 class NetworkingStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         env_type = self.node.try_get_context('env_type')
         resource_prefix = self.node.try_get_context(env_type)['resourcePrefix']
 
-    # Create a VPC
+        # Create a VPC
         self.vpc = ec2.Vpc(
             self, f"{resource_prefix}VPC",
             max_azs=3,
@@ -47,13 +48,18 @@ class NetworkingStack(Stack):
             ]
         )
         # Import the existing VPC
-        #vpc = ec2.Vpc.from_lookup(self, "VPC", vpc_name="devEnv01")
+        # vpc = ec2.Vpc.from_lookup(self, "VPC", vpc_name="devEnv01")
+
 
 class DevStack(Stack):
     def __init__(self, scope: Construct, id: str, vpc: ec2.Vpc, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         env_type = self.node.try_get_context('env_type')
         resource_prefix = self.node.try_get_context(env_type)['resourcePrefix']
+        # latest_ami = ec2.MachineImage.lookup(
+        #    name="amzn2-ami-hvm-*-x86_64-gp2",
+        # )
+        latest_ami = ec2.MachineImage.latest_amazon_linux2()
         # Create an Application Load Balancer
         alb = elbv2.ApplicationLoadBalancer(
             self, f"{resource_prefix}ALB",
@@ -64,9 +70,9 @@ class DevStack(Stack):
         # Create an EC2 instance for the web server
         web_server = ec2.Instance(
             self, f"{resource_prefix}WebServers",
-            user_data = web_server_user_data,
+            user_data=web_server_user_data,
             instance_type=ec2.InstanceType("t3.micro"),
-            machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            machine_image=latest_ami,
             vpc=vpc,
             vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC}
         )
@@ -74,7 +80,7 @@ class DevStack(Stack):
         # Create an EC2 instance for the application server
         app_server = ec2.Instance(
             self, f"{resource_prefix}AppServers",
-            user_data = app_server_user_data,
+            user_data=app_server_user_data,
             instance_type=ec2.InstanceType("t3.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2(),
             vpc=vpc,
