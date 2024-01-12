@@ -3,6 +3,7 @@
 from aws_cdk import aws_ec2 as ec2, aws_rds as rds, aws_elasticloadbalancingv2 as elbv2
 from aws_cdk import Stack
 from constructs import Construct
+from os import environ
 
 web_server_user_data = ec2.UserData.for_linux()
 web_server_user_data.add_commands(
@@ -55,10 +56,13 @@ class DevStack(Stack):
         super().__init__(scope, id, **kwargs)
         env_type = self.node.try_get_context('env_type')
         resource_prefix = self.node.try_get_context(env_type)['resourcePrefix']
-        # latest_ami = ec2.MachineImage.lookup(
-        #    name="amzn2-ami-hvm-*-x86_64-gp2",
-        # )
-        latest_ami = ec2.MachineImage.latest_amazon_linux2()
+        if "CDK_AMI_ACCOUNT" in environ:
+            latest_ami = ec2.MachineImage.lookup(
+                name="amzn2-ami-hvm-*-x86_64-gp2",
+                owners=[environ["CDK_AMI_ACCOUNT"]]
+             )
+        else:
+            latest_ami = ec2.MachineImage.latest_amazon_linux2()
         # Create an Application Load Balancer
         alb = elbv2.ApplicationLoadBalancer(
             self, f"{resource_prefix}ALB",
