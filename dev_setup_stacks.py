@@ -81,7 +81,7 @@ class DevStack(Stack):
             self, f"{resource_prefix}AppServers",
             user_data=app_server_user_data,
             instance_type=ec2.InstanceType("t3.micro"),
-            machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            machine_image=latest_ami,
             vpc=vpc,
             vpc_subnets={'subnet_type': ec2.SubnetType.PRIVATE_WITH_EGRESS}
         )

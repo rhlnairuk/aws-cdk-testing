@@ -4,9 +4,11 @@ from aws_cdk import App
 from dev_setup_stacks import NetworkingStack, DevStack
 import aws_cdk as cdk
 
-aws_account = os.environ['CDK_DEPLOY_ACCOUNT']
 app = App()
-env_default = cdk.Environment(region="us-east-1", account=aws_account)
+if "CDK_DEPLOY_ACCOUNT" in os.environ:
+    env_default = cdk.Environment(region="us-east-1", account=os.environ['CDK_DEPLOY_ACCOUNT'])
+else:
+    env_default = cdk.Environment(region="us-east-1")
 # DevStack(app, "DevStack",
 #         env=cdk.Environment(region="us-east-1")
 NetworkStack = NetworkingStack(app, "NetworkingStack", env=env_default)
