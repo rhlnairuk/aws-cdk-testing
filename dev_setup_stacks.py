@@ -3,7 +3,6 @@
 from aws_cdk import aws_ec2 as ec2, aws_rds as rds, aws_elasticloadbalancingv2 as elbv2
 from aws_cdk import Stack
 from constructs import Construct
-from aws_cdk import App
 
 web_server_user_data = ec2.UserData.for_linux()
 web_server_user_data.add_commands(
