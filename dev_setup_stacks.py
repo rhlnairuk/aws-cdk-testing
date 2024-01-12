@@ -6,9 +6,6 @@ from constructs import Construct
 from os import environ
 import boto3
 
-client = boto3.client('ec2', region_name='us-east-1')
-
-
 web_server_user_data = ec2.UserData.for_linux()
 web_server_user_data.add_commands(
     "echo 'Configuring as web server'",
@@ -60,16 +57,20 @@ class DevStack(Stack):
         super().__init__(scope, id, **kwargs)
         env_type = self.node.try_get_context('env_type')
         resource_prefix = self.node.try_get_context(env_type)['resourcePrefix']
-        if "CDK_AMI_ACCOUNT" in environ:
+        if "CDK_AMI_ACCOUNT" in environ and "CDK_AMI_REGION" in environ:
+            client = boto3.client('ec2', region_name=environ["CDK_AMI_REGION"])
             response = client.describe_images(
                 Owners=[environ["CDK_AMI_ACCOUNT"]],  # Account ID of the AMI owner
                 Filters=[{'Name': 'name', 'Values': ['amzn2-ami-hvm-*-x86_64-gp2']}]
             )
             # Extract the AMI ID (you might need additional logic to find the latest one)
-            ami_id = response['Images'][0]['ImageId']
-            latest_ami = ec2.MachineImage.generic_linux({
-                "us-east-1": ami_id
-            })
+            try:
+                ami_id = response['Images'][0]['ImageId']
+                latest_ami = ec2.MachineImage.generic_linux({
+                    environ["CDK_AMI_REGION"]: ami_id
+                })
+            except:
+                latest_ami = ec2.MachineImage.latest_amazon_linux2()
         else:
             latest_ami = ec2.MachineImage.latest_amazon_linux2()
         # Create an Application Load Balancer

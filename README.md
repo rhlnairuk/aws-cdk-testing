@@ -44,10 +44,19 @@ Once the virtualenv is activated, you can install the required dependencies.
 $ pip install -r requirements.txt
 ```
 
-set AWS account id in environment variable
+Set environment variables
 ```
 export CDK_DEPLOY_ACCOUNT=<aws-account-id>
 ```
+
+```
+export CDK_AMI_ACCOUNT=<aws-account-id>
+```
+```
+export CDK_AMI_REGION=<aws-ami-region>
+```
+
+
 
 At this point you can now synthesize the CloudFormation template for this code.
 
