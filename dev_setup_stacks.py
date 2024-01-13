@@ -66,11 +66,12 @@ class DevStack(Stack):
             # Extract the AMI ID (you might need additional logic to find the latest one)
             try:
                 ami_id = response['Images'][0]['ImageId']
+            except:
+                latest_ami = ec2.MachineImage.latest_amazon_linux2()
+            else:
                 latest_ami = ec2.MachineImage.generic_linux({
                     environ["CDK_AMI_REGION"]: ami_id
                 })
-            except:
-                latest_ami = ec2.MachineImage.latest_amazon_linux2()
         else:
             latest_ami = ec2.MachineImage.latest_amazon_linux2()
         # Create an Application Load Balancer
