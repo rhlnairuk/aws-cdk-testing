@@ -55,7 +55,9 @@ export CDK_AMI_ACCOUNT=<aws-account-id>
 ```
 export CDK_AMI_REGION=<aws-ami-region>
 ```
-
+```
+export CDK_IMAGE_REGEX=^amzn2-ami-hvm.latest*
+```
 
 
 At this point you can now synthesize the CloudFormation template for this code.
