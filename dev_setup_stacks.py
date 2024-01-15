@@ -78,12 +78,22 @@ class DevStack(Stack):
                 })
         else:
             latest_ami = ec2.MachineImage.latest_amazon_linux2()
+        # Create a security group for the load balancer
+        lb_sg = ec2.SecurityGroup(self, "LoadBalancerSG",
+                              vpc=vpc,
+                              allow_all_outbound=True,
+                              description="Security group for load balancer"
+                              )
+        lb_sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(80))
+
         # Create an Application Load Balancer
         alb = elbv2.ApplicationLoadBalancer(
             self, f"{resource_prefix}ALB",
             vpc=vpc,
-            internet_facing=True
+            internet_facing=True,
+            security_group=lb_sg
         )
+        listener = load_balancer.add_listener("Listener", port=80)
 
         # Create an EC2 instance for the web server
         web_server = ec2.Instance(
@@ -94,6 +104,10 @@ class DevStack(Stack):
             vpc=vpc,
             vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC}
         )
+        listener.add_targets("Target",
+                             port=80,
+                             targets=[web_server]
+                             )
 
         # Create an EC2 instance for the application server
         app_server = ec2.Instance(
