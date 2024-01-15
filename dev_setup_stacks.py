@@ -106,10 +106,10 @@ class DevStack(Stack):
         )
 
         # Create an RDS instance
-        db = rds.DatabaseInstance(
-            self, f"{resource_prefix}DatabaseServers",
-            engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_15_2),
-            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
-            vpc=vpc,
-            vpc_subnets={'subnet_type': ec2.SubnetType.PRIVATE_ISOLATED}
-        )
+#        db = rds.DatabaseInstance(
+#            self, f"{resource_prefix}DatabaseServers",
+#            engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_15_2),
+#            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
+#            vpc=vpc,
+#            vpc_subnets={'subnet_type': ec2.SubnetType.PRIVATE_ISOLATED}
+#        )
