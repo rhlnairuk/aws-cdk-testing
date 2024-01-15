@@ -94,8 +94,9 @@ class DevStack(Stack):
             security_group=lb_sg
         )
         listener = alb.add_listener("Listener", port=80)
-        webserver_asg = autoscaling.AutoScalingGroup(self, "ASG",
+        webserver_asg = autoscaling.AutoScalingGroup(self, "webservers_ASG",
                                                      vpc=vpc,
+                                                     vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC},
                                                      instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2,
                                                                                        ec2.InstanceSize.MICRO),
                                                      machine_image=latest_ami,
@@ -108,15 +109,15 @@ class DevStack(Stack):
                                                target_utilization_percent=50
                                                )
 
-        # Create an EC2 instance for the web server
-        web_server = ec2.Instance(
-            self, f"{resource_prefix}WebServers",
-            user_data=web_server_user_data,
-            instance_type=ec2.InstanceType("t3.micro"),
-            machine_image=latest_ami,
-            vpc=vpc,
-            vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC}
-        )
+        # OR Create an EC2 instance for the web server
+#        web_server = ec2.Instance(
+#            self, f"{resource_prefix}WebServers",
+#            user_data=web_server_user_data,
+#            instance_type=ec2.InstanceType("t3.micro"),
+#            machine_image=latest_ami,
+#            vpc=vpc,
+#            vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC}
+#        )
 
         # Create an EC2 instance for the application server
         app_server = ec2.Instance(
