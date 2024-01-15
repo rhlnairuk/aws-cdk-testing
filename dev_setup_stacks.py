@@ -1,6 +1,6 @@
 # my_server_setup.py
 
-from aws_cdk import aws_ec2 as ec2, aws_rds as rds, aws_elasticloadbalancingv2 as elbv2
+from aws_cdk import aws_ec2 as ec2, aws_rds as rds, aws_elasticloadbalancingv2 as elbv2, aws_autoscaling as autoscaling
 from aws_cdk import Stack
 from constructs import Construct
 from os import environ
@@ -80,10 +80,10 @@ class DevStack(Stack):
             latest_ami = ec2.MachineImage.latest_amazon_linux2()
         # Create a security group for the load balancer
         lb_sg = ec2.SecurityGroup(self, "LoadBalancerSG",
-                              vpc=vpc,
-                              allow_all_outbound=True,
-                              description="Security group for load balancer"
-                              )
+                                  vpc=vpc,
+                                  allow_all_outbound=True,
+                                  description="Security group for load balancer"
+                                  )
         lb_sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(80))
 
         # Create an Application Load Balancer
@@ -93,6 +93,20 @@ class DevStack(Stack):
             internet_facing=True,
             security_group=lb_sg
         )
+        listener = alb.add_listener("Listener", port=80)
+        webserver_asg = autoscaling.AutoScalingGroup(self, "ASG",
+                                                     vpc=vpc,
+                                                     instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2,
+                                                                                       ec2.InstanceSize.MICRO),
+                                                     machine_image=latest_ami,
+                                                     min_capacity=1,
+                                                     max_capacity=5
+                                                     )
+        listener.add_targets("Target", port=80, targets=[webserver_asg])
+        # Scaling policy based on CPU utilization
+        webserver_asg.scale_on_cpu_utilization("CpuScaling",
+                                               target_utilization_percent=50
+                                               )
 
         # Create an EC2 instance for the web server
         web_server = ec2.Instance(
