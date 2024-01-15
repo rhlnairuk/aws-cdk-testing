@@ -104,10 +104,6 @@ class DevStack(Stack):
             vpc=vpc,
             vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC}
         )
-        listener.add_targets("Target",
-                             port=80,
-                             targets=[web_server]
-                             )
 
         # Create an EC2 instance for the application server
         app_server = ec2.Instance(
