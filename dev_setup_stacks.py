@@ -93,7 +93,6 @@ class DevStack(Stack):
             internet_facing=True,
             security_group=lb_sg
         )
-        listener = alb.add_listener("Listener", port=80)
 
         # Create an EC2 instance for the web server
         web_server = ec2.Instance(
