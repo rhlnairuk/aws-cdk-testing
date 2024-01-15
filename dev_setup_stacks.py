@@ -93,12 +93,12 @@ class DevStack(Stack):
             internet_facing=True,
             security_group=lb_sg
         )
-        listener = alb.add_listener("Listener", port=80)
-        webserver_asg = autoscaling.AutoScalingGroup(self, "webservers_ASG",
+        listener = alb.add_listener(f"{resource_prefix}WebListener", port=80)
+        webserver_asg = autoscaling.AutoScalingGroup(self, f"{resource_prefix}WebServers_ASG",
                                                      vpc=vpc,
                                                      vpc_subnets={'subnet_type': ec2.SubnetType.PUBLIC},
-                                                     instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2,
-                                                                                       ec2.InstanceSize.MICRO),
+                                                     user_data=web_server_user_data,
+                                                     instance_type=ec2.InstanceType("t3.micro"),
                                                      machine_image=latest_ami,
                                                      min_capacity=1,
                                                      max_capacity=5
