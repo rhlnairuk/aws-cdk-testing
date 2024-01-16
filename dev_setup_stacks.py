@@ -59,10 +59,10 @@ class DevStack(Stack):
         resource_prefix = self.node.try_get_context(env_type)['resourcePrefix']
         if "CDK_AMI_ACCOUNT" in environ and "CDK_AMI_REGION" in environ:
             client = boto3.client('ec2', region_name=environ["CDK_AMI_REGION"])
-            if environ["CDK_IMAGE_REGEX"] is None:
-                cdk_image_regex = "^amzn2-ami-hvm.*"  # Default regex to find latest Amazon Linux 2 AMI.
-            else:
+            if "CDK_IMAGE_REGEX" in environ:
                 cdk_image_regex = environ["CDK_IMAGE_REGEX"]
+            else:
+                cdk_image_regex = "^amzn2-ami-hvm.*"  # Default regex to find latest Amazon Linux 2 AMI.
             response = client.describe_images(
                 Owners=[environ["CDK_AMI_ACCOUNT"]],  # Account ID of the AMI owner
                 Filters=[{'Name': 'name', 'Values': [cdk_image_regex]}]
